@@ -1,0 +1,25 @@
+Hi guys your first assignment has been allocated hope you will like it. have fun !
+git@github.com:nirojmagar/trainee-nodejs.git
+
+Sumaly => Presentation(min 2 slides) on Nodejs module system : hot it works , differentiate core modules , npm modules , project modules(own files), define entry point to your project with package.json explanation on what happens when you import (require) third party library into your project.
+code demonstration for book CRUD operation on library implementing Yargs for different folder structure as its index storing data to json file
+like all comic book should be stored inside comic directory and historical should be inside historical
+
+a book has property {name,author,genre} : if directory named genre already exists execute required operation on that else create new directory named genre and execute required operation
+
+when your application starts there should be options like : 
+1. create books
+2. get book by name
+3. update book by name
+4. get all book list
+5. search book
+6. delete book by name
+Select a action : <user is allowed to choose integer value [1-6]>
+
+Nikesh  => Presentation(min 2 slides) on event loop , callstack, callback queue,
+code demonstrating implementation of Promise APIS that is Promise.all(), Promise.allSettled(), Promise.any() and Promise.race()
+with error handling implementation
+Pratik => Presentation(min 2 slides) on different authentication mechanism (cookies, session, token...) 
+code demonstration on token based authentication with implementation of jsonwebtoken including basic feature of create user(sign up), sign token (login), validate token(API/route guard protected routes)
+
+Sorry for the delay had another meeting immediately.
