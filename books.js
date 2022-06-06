@@ -1,7 +1,7 @@
 const fs = require('fs')
-// const { get } = require('http')
-const process = require('process')
+// const process = require('process')
 const bookController = {}
+const chalk = require('chalk')
 
 
 bookController.addBook = (name,author,genre) => {
@@ -19,7 +19,7 @@ bookController.addBook = (name,author,genre) => {
     // process.chdir('./books')
     const books = loadBooks(genre)
     if(books.length == 0) {
-        console.log('Adding new genre')
+        console.log(chalk.green.inverse('Adding new genre'))
     }
     const duplicateBook = books.find((book) => book.name == name)
 
@@ -29,10 +29,10 @@ bookController.addBook = (name,author,genre) => {
             author: author,
             genre:genre
         })
-        savebooks(books,genre)
-        console.log('New book added!')
+        saveBooks(books,genre)
+        console.log(chalk.green.inverse('New book added!'))
     } else {
-        console.log('Book name taken!')
+        console.log(chalk.red.inverse('Book name taken!'))
     }
 })
 }
@@ -52,7 +52,7 @@ bookController.addBook = (name,author,genre) => {
 bookController.getBookByName = (name) => {
     
     const allBooks = loadAllBooks()
-    console.log('Getting the matched book name from all genres')
+    console.log(chalk.green.inverse('Getting the matched book name from all genres'))
     let bookFound = false
     allBooks.forEach(books => {
         const book = books.find((book) => book.name === name)
@@ -62,7 +62,7 @@ bookController.getBookByName = (name) => {
         }
     })
     if (!bookFound){
-        console.log('No matching book name')
+        console.log(chalk.red.inverse('No matching book name'))
     }
   
 }
@@ -77,7 +77,7 @@ bookController.getAllBook = () => {
     //     console.log(books)
 
     // });
-    console.log('All books', loadAllBooks());
+    console.log(chalk.green.inverse('All books'), loadAllBooks());
 }
 
 bookController.updateBookByName = (name,genre,newName) => {
@@ -85,21 +85,26 @@ bookController.updateBookByName = (name,genre,newName) => {
     const books = loadBooks(genre)
     const updatedBooks = []
     let bookFound = false
-    books.forEach(tempBook => {
-        if(tempBook.name === name) {
-            tempBook.name = newName
-            bookFound = true
-        }
-          updatedBooks.push(tempBook)
-    })
-    if(bookFound) {
-        savebooks(updatedBooks,genre)
-        // process.chdir('..')
-        getAllBook()
-    } else {
-        console.log("Book not found")
-    }
  
+    let sameBookFound = books.find(tempBook => tempBook.name == newName)
+    if(!sameBookFound){
+        books.forEach(tempBook => {
+            if(tempBook.name === name) {
+                tempBook.name = newName
+                bookFound = true
+            }
+              updatedBooks.push(tempBook)
+        })
+        if(bookFound) {
+            saveBooks(updatedBooks,genre)
+            // process.chdir('..')
+            bookController.getAllBook()
+        } else {
+            console.log(chalk.red.inverse("Book not found"))
+        }
+    }else{
+        console.log(chalk.red.inverse("The new name of the book is already taken."))
+    }
 }
 
 bookController.deleteBookByName = (name,genre) => {
@@ -114,16 +119,34 @@ bookController.deleteBookByName = (name,genre) => {
         }
     })
     if(bookFound) {
-        savebooks(tempBooks,genre)
-        console.log(`Removed book = ${name} and updated book list is `)
-        getAllBook()
+        saveBooks(tempBooks,genre)
+        console.log(chalk.green.inverse(`Removed book = ${name} and updated book list is `))
+        bookController.getAllBook()
     } else {
-        console.log("Book not found")
+        console.log(chalk.red.inverse("Book not found"))
     }
  
 }
 
-const savebooks = (books,genre) => {
+bookController.search = (name) => {
+    
+    const allBooks = loadAllBooks()
+    console.log(chalk.green.inverse('Getting the matched book name from all genres'))
+    let bookFound = false
+    for(books of allBooks){
+        const book = books.find((book) => book.name === name)
+        if(book){
+            bookFound = true
+            console.log(book)
+            break
+        }
+    }
+    if (!bookFound){
+        console.log(chalk.red.inverse('No matching book name'))
+    }
+}
+
+const saveBooks = (books,genre) => {
     const dataJSON = JSON.stringify(books)
     fs.writeFileSync(`./books/${genre}.json`, dataJSON)
 }
@@ -134,7 +157,7 @@ const loadBooks = (genre) => {
         const dataJSON = dataBuffer.toString()
         return JSON.parse(dataJSON)
     } catch (err) {
-        console.log('Genre not found',err)
+        console.log(chalk.red.inverse('Genre not found'),err)
         return []
     }
 }

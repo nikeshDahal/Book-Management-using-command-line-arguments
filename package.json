@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "chalk": "^2.4.1",
     "yargs": "^17.5.1"
   }
 }

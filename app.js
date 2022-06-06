@@ -1,14 +1,13 @@
 const yargs= require('yargs')
 
-// const readline = require("readline");
 const books = require('./books.js')
 
-console.log("welcome to Book Management");
-console.log("select your options ....");
+console.log("Welcome to Book Management");
+console.log("Select your options ....");
 console.log(
-  " 1.create books\n2. get book by name\n3. update book by name\n4. get all book list\n5. search book\n6. delete book by name\n"
+  "1. create books\n2. get book by name\n3. update book by name\n4. get all book list\n5. delete book by name\n6. search book"
 );
-console.log("to select , please type : node app.js select_option --option=type any number from 1 to 6")
+console.log("to select , please type : node app.js select_option(i.e 1-6) --option=value")
 
 yargs.command({
   command: '1',
@@ -84,7 +83,7 @@ yargs.command({
 })
 
 yargs.command({
-  command: '6',
+  command: '5',
   describe:'Delete book name',
   builder:{
     name: {
@@ -103,6 +102,19 @@ yargs.command({
 }
 })
 
-
+yargs.command({
+  command: '6',
+  describe: 'Search',
+  builder: {
+      name: {
+          describe: 'Book name',
+          demandOption: true,
+          type: 'string'
+      }
+  },
+  handler(argv) {
+      books.search(argv.name)
+  }
+})
 
 yargs.parse()
