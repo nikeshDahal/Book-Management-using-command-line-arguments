@@ -34,4 +34,75 @@ yargs.command({
       books.addBook(argv.name, argv.author,argv.genre)
   }
 })
+
+yargs.command({
+  command: '2',
+  describe: 'Get book by name',
+  builder: {
+      name: {
+          describe: 'Book name',
+          demandOption: true,
+          type: 'string'
+      }
+  },
+  handler(argv) {
+      books.getBookByName(argv.name)
+  }
+})
+
+yargs.command({
+  command: '3',
+  describe:'Update book name',
+  builder:{
+    name: {
+      describe: 'Book name',
+        demandOption: true,
+        type: 'string'
+    },
+    genre:{
+      describe: 'Book genre',
+        demandOption: true,
+        type: 'string'
+    },
+    newName: {
+      describe: 'New book name',
+      demandOption: true,
+      type: 'string'
+    }
+  },
+  handler(argv) {
+    books.updateBookByName(argv.name,argv.genre,argv.newName)
+}
+})
+
+yargs.command({
+  command: '4',
+  describe: 'Get all book',
+  handler() {
+      books.getAllBook()
+  }
+})
+
+yargs.command({
+  command: '6',
+  describe:'Delete book name',
+  builder:{
+    name: {
+      describe: 'Book name',
+        demandOption: true,
+        type: 'string'
+    },
+    genre:{
+      describe: 'Book genre',
+        demandOption: true,
+        type: 'string'
+    }
+  },
+  handler(argv) {
+    books.deleteBookByName(argv.name,argv.genre)
+}
+})
+
+
+
 yargs.parse()

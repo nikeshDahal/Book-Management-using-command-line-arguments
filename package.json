@@ -1,5 +1,24 @@
 {
   "dependencies": {
     "yargs": "^17.5.1"
-  }
+  },
+  "name": "book-management-using-command-line-arguments",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikeshDahal/Book-Management-using-command-line-arguments.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nikeshDahal/Book-Management-using-command-line-arguments/issues"
+  },
+  "homepage": "https://github.com/nikeshDahal/Book-Management-using-command-line-arguments#readme",
+  "devDependencies": {},
+  "description": ""
 }
