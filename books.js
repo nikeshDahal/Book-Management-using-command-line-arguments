@@ -55,18 +55,16 @@ const getBookByName = (name) => {
     });
 };
 
-const getAllBook = () => {
-  const getAllBookPromise = new Promise(function (resolve, reject) {
-    let books = loadAllBooks();
-    resolve(books);
-  });
-  getAllBookPromise
-    .then((books) => {
-      console.log("book found", books);
-    })
-    .catch((error) => {
-      console.log("could not get all books", error);
-    });
+const getAllBook = async () => {
+  let start = new Date().getTime();
+  try {
+    let books = await loadAllBooks();
+    console.log("book found", books);
+  } catch (error) {
+    console.log("could not get all books", error);
+  }
+  let end = new Date().getTime();
+  console.log("getAllBook => ", (end - start) / 1000, " seconds");
 };
 
 const updateBookByName = (name, genre, newName) => {
@@ -137,25 +135,37 @@ const savebooks = (books, genre) => {
 };
 
 const loadBooks = (genre) => {
-  try {
-    const dataBuffer = fs.readFileSync(`./books/${genre}.json`);
-    const dataJSON = dataBuffer.toString();
-    return JSON.parse(dataJSON);
-  } catch (err) {
-    console.log("Genre not found", err);
-    return [];
-  }
+  let start = new Date().getTime();
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      fs.readFile(`./books/${genre}.json`, (err, dataBuffer) => {
+        if (err) reject(err);
+        const dataJSON = dataBuffer.toString();
+        let end = new Date().getTime();
+        console.log("loadBooks => ", (end - start) / 1000, " seconds");
+        return resolve(JSON.parse(dataJSON));
+      });
+    }, 5000);
+  });
 };
 
-const loadAllBooks = () => {
+const loadAllBooks = async () => {
+  let start = new Date().getTime();
+
   const arrayOfFiles = fs.readdirSync("./books");
   let booksArray = [];
-  arrayOfFiles.forEach((fileName) => {
+  /* for (let fileName of arrayOfFiles) {
     fileName = fileName.split(".")[0];
-    booksArray.push(loadBooks(fileName));
-  });
+    booksArray.push(...(await loadBooks(fileName)));
+  } */
+  const results = await Promise.all(
+    arrayOfFiles.map((fileName) => loadBooks(fileName.split(".")[0]))
+  );
+  for (let books of results) booksArray = booksArray.concat(books);
+
+  let end = new Date().getTime();
+  console.log("loadAllBooks => ", (end - start) / 1000, " seconds");
   return booksArray;
-  // console.log('booksArray',booksArray)
 };
 
 module.exports = {
