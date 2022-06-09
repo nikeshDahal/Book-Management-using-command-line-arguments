@@ -3,63 +3,55 @@ const fs = require("fs");
 // const { get } = require('http')
 const process = require("process");
 
-const addBook = (name, author, genre) => {
-  const addBookPromise = new Promise(function (resolve, reject) {
-    const books = loadBooks(genre);
+const addBook = async (name, author, genre) => {
+    const books = await loadBooks(genre);
     if (books.length == 0) {
       console.log("Adding new genre");
     }
-    const duplicateBook = books.find((book) => book.name == name);
+    const duplicateBook = books.find((book) => book.name == name)
     if (!duplicateBook) {
-      resolve(books);
+        books.push({
+            name: name,
+            author: author,
+            genre:genre
+        })
+        savebooks(books,genre)
+        console.log('New book added!');
+        console.log(`Books of ${genre} are : `,books);
     } else {
-      reject(error);
+        console.log('Book name taken!');
     }
-  })
-    .then((books) => {
-      books.push({
-        name: name,
-        author: author,
-        genre: genre,
+};
+//updated get book by name
+const getBookByName = async (name) => {
+    let start = new Date().getTime();
+    try {
+      let allBooks =await loadAllBooks();
+      console.log("Getting the matched book name from all genres");
+      let isBookFound = false;
+       allBooks.forEach((books) => {
+        const foundBook = (books.name === name);
+        if (foundBook) {
+          isBookFound = true;
+          console.log(foundBook)
+          console.log("book found", books);
+        }
       });
-      savebooks(books, genre);
-      console.log("New book added!");
-    })
-    .catch((error) => {
-      console.log("book already taken");
-    });
-};
-
-const getBookByName = (name) => {
-  const getBookPromise = new Promise((resolve, reject) => {
-    const allBooks = loadAllBooks();
-    console.log("Getting the matched book name from all genres");
-    let bookFound = false;
-    allBooks.forEach((books) => {
-      const book = books.find((book) => book.name === name);
-      if (book) {
-        bookFound = true;
-        resolve(book);
-      }
-    });
-    if (!bookFound) {
-      reject(error);
+        if (!isBookFound) {
+          console.log("book not found", error);
+        }
+    } catch (error) {
+      console.log('failed to get books by name')
     }
-  });
-  getBookPromise
-    .then((book) => {
-      console.log("book found", book);
-    })
-    .catch((error) => {
-      console.log("book not found", error);
-    });
+    let end = new Date().getTime();
+    console.log("getBookByName => ", (end - start) / 1000, " seconds");
 };
-
+//updated get all book
 const getAllBook = async () => {
   let start = new Date().getTime();
   try {
     let books = await loadAllBooks();
-    console.log("book found", books);
+    console.log("Total list of books are :", books);
   } catch (error) {
     console.log("could not get all books", error);
   }
@@ -67,9 +59,9 @@ const getAllBook = async () => {
   console.log("getAllBook => ", (end - start) / 1000, " seconds");
 };
 
-const updateBookByName = (name, genre, newName) => {
-  const updateBookPromise = new Promise((resolve, reject) => {
-    const books = loadBooks(genre);
+const updateBookByName =async (name, genre, newName) => {
+  try {
+    const books = await loadBooks(genre);//loads the particular file
     const updatedBooks = [];
     let bookFound = false;
     books.forEach((tempBook) => {
@@ -80,29 +72,20 @@ const updateBookByName = (name, genre, newName) => {
       }
     });
     if (bookFound) {
-      resolve(updatedBooks);
-
-      // savebooks(updatedBooks,genre)
-      // console.log('books updated')
-      // // process.chdir('..')
-      // getAllBook()
-    } else {
-      reject(err);
-    }
-  })
-    .then((updatedBooks) => {
       savebooks(updatedBooks, genre);
       console.log("books updated");
       getAllBook();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+    }else{
+      throw new Error();
+    }
+  } catch (error) {
+    console.log('failed in updating book. book not found');    
+  }
+}
 
-const deleteBookByName = (name, genre) => {
-  const deleteBookPromise = new Promise(function (resolve, reject) {
-    const books = loadBooks(genre);
+const deleteBookByName = async (name, genre) => {
+  try {
+    const books = await loadBooks(genre);
     const tempBooks = [];
     let bookFound = false;
     books.forEach((tempBook) => {
@@ -113,20 +96,15 @@ const deleteBookByName = (name, genre) => {
       }
     });
     if (bookFound) {
-      resolve(tempBooks);
-    } else {
-      console.log("Book not found");
-    }
-  });
-  deleteBookPromise
-    .then((tempBooks) => {
       savebooks(tempBooks, genre);
       console.log(`Removed book = ${name} and updated book list is: `);
       getAllBook();
-    })
-    .catch((error) => {
-      console.log("book not found", error);
-    });
+    } else {
+      throw new Error();
+    }
+  } catch (error) {
+    console.log('failed to delete book. book name not found')
+  }
 };
 
 const savebooks = (books, genre) => {
@@ -135,38 +113,40 @@ const savebooks = (books, genre) => {
 };
 
 const loadBooks = (genre) => {
-  let start = new Date().getTime();
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      fs.readFile(`./books/${genre}.json`, (err, dataBuffer) => {
-        if (err) reject(err);
-        const dataJSON = dataBuffer.toString();
-        let end = new Date().getTime();
-        console.log("loadBooks => ", (end - start) / 1000, " seconds");
-        return resolve(JSON.parse(dataJSON));
-      });
-    }, 5000);
-  });
+    // let start = new Date().getTime();
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        fs.readFile(`./books/${genre}.json`, (err, dataBuffer) => {
+          if (err) {
+            return resolve([])
+          }
+          const dataJSON = dataBuffer.toString();
+          // let end = new Date().getTime();
+          // console.log("loadBooks => ", (end - start) / 1000, " seconds");
+          return resolve(JSON.parse(dataJSON));
+        });
+      }, 2000);
+    }); 
 };
 
 const loadAllBooks = async () => {
-  let start = new Date().getTime();
-
+  // let start = new Date().getTime();
   const arrayOfFiles = fs.readdirSync("./books");
+  // console.log('array of files',arrayOfFiles)
   let booksArray = [];
-  /* for (let fileName of arrayOfFiles) {
-    fileName = fileName.split(".")[0];
-    booksArray.push(...(await loadBooks(fileName)));
-  } */
+  //  for (let fileName of arrayOfFiles) {
+  //   fileName = fileName.split(".")[0];
+  //   booksArray.push(...(await loadBooks(fileName)));
+  // } 
   const results = await Promise.all(
     arrayOfFiles.map((fileName) => loadBooks(fileName.split(".")[0]))
   );
   for (let books of results) booksArray = booksArray.concat(books);
-
-  let end = new Date().getTime();
-  console.log("loadAllBooks => ", (end - start) / 1000, " seconds");
+  // let end = new Date().getTime();
+  // console.log("loadAllBooks => ", (end - start) / 1000, " seconds");
   return booksArray;
 };
+
 
 module.exports = {
   addBook: addBook,
@@ -175,3 +155,5 @@ module.exports = {
   updateBookByName: updateBookByName,
   deleteBookByName: deleteBookByName,
 };
+
+
